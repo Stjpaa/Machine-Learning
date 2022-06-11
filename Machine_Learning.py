@@ -8,9 +8,12 @@ def predict(X, w):
 def loss(X, Y, w):
     return np.average((predict(X, w) - Y) ** 2)
 
-# Better function to calculate the average loss
+# Gradient function to calculate the label
 def gradient(X, Y, w):
     return 2 * np.matmul(X.T, (predict(X, w) - Y)) / X.shape[0]
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
 # Train the weight // lr is the amount w changes with each iteration
 def train(X, Y, iterations, lr):
@@ -20,7 +23,7 @@ def train(X, Y, iterations, lr):
         w -= gradient(X, Y, w) * lr
     return w
 
-# Read array data into two arrays
+# Read array data into arrays
 x1, x2, x3, y = np.loadtxt("pizza.txt", skiprows = 1, unpack = True)
 
 # Create a (4, n) Matrix
