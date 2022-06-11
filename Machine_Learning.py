@@ -1,19 +1,26 @@
 import numpy as np
 
 # Predict the loss via matrix multiplication
-def predict(X, w):
-    return np.matmul(X, w)
+def forward(X, w):
+    weighted_sum = np.matmul(X, w)
+    return sigmoid(weighted_sum)
 
 # Average the squared loss
 def loss(X, Y, w):
-    return np.average((predict(X, w) - Y) ** 2)
+    y_hat = forward(X, w)
+    first_term = Y * np.log(y_hat)
+    second_term = (1 - Y) * np.log(1 - y_hat)
+    return -np.average(first_term + second_term)
 
 # Gradient function to calculate the label
 def gradient(X, Y, w):
-    return 2 * np.matmul(X.T, (predict(X, w) - Y)) / X.shape[0]
+    return np.matmul(X.T, (forward(X, w) - Y)) / X.shape[0]
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+
+def classify(X, w):
+    return np.round(forward(X, w))
 
 # Train the weight // lr is the amount w changes with each iteration
 def train(X, Y, iterations, lr):
@@ -23,19 +30,19 @@ def train(X, Y, iterations, lr):
         w -= gradient(X, Y, w) * lr
     return w
 
-# Read array data into arrays
+def test(X, Y, w):
+    total_examples = X.shape[0]
+    correct_results = np.sum(classify(X, w) == Y)
+    success_percent = correct_results * 100 / total_examples
+    print("\nSuccess: %d/%d (%.2f%%" % (correct_results, total_examples, success_percent))
+
+
 x1, x2, x3, y = np.loadtxt("pizza.txt", skiprows = 1, unpack = True)
-
-# Create a (4, n) Matrix
 X = np.column_stack(((np.ones(x1.size)), x1, x2, x3))
-# Shape Y so it takes (n, 1) Elements
 Y = y.reshape(-1, 1)
-
 w = train(X, Y, iterations = 10000, lr = 0.001)
-print("\nWeights: %s" % w.T)
-print("\nA few predictions:")
-for i in range(4):
-    print("X[%d] -> %.4f (label: %d)" % (i, predict(X[i], w), Y[i]))
+
+test(X, Y, w)
 
 
 
