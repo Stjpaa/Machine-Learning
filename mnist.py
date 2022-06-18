@@ -21,11 +21,18 @@ def load_labels(filename):
         all_labels = f.read()
         return np.frombuffer(all_labels, dtype = np.uint8).reshape(-1, 1)
 
-def encode_fives(Y):
-    return (Y == 5).astype(int)
+def one_hot_encode(Y):
+    n_labels = Y.shape[0]
+    n_classes = 10
+    encoded_Y = np.zeros((n_labels, n_classes))
+    for i in range(n_labels):
+        label = Y[i]
+        encoded_Y[i][label] = 1
+    return encoded_Y
 
-Y_train = encode_fives(load_labels("train-labels-idx1-ubyte.gz"))
-Y_test = encode_fives(load_labels("t10k-labels-idx1-ubyte.gz"))
+Y_train_unencoded = load_labels("train-labels-idx1-ubyte.gz")
+Y_train = one_hot_encode(Y_train_unencoded)
+Y_test = load_labels("t10k-labels-idx1-ubyte.gz")
 
 X_train = prepend_bias(load_images("train-images-idx3-ubyte.gz"))
 X_test = prepend_bias(load_images("t10k-images-idx3-ubyte.gz"))
