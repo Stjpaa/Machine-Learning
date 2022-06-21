@@ -1,32 +1,27 @@
 import numpy as np
 import mnist as data
 
-# Predict the loss via matrix multiplication
 def forward(X, w):
     weighted_sum = np.matmul(X, w)
     return sigmoid(weighted_sum)
 
-# Average the squared loss
 def loss(X, Y, w):
     y_hat = forward(X, w)
     first_term = Y * np.log(y_hat)
     second_term = (1 - Y) * np.log(1 - y_hat)
     return -np.sum(first_term + second_term) / X.shape[0]
 
-# Gradient function to calculate the label
 def gradient(X, Y, w):
     return np.matmul(X.T, (forward(X, w) - Y)) / X.shape[0]
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-# Classify the result to either 0 or 1 (false or true)
 def classify(X, w):
     y_hat = forward(X, w)
     labels = np.argmax(y_hat, axis = 1)
     return labels.reshape(-1, 1)
 
-# Train the weight // lr is the amount w changes with each iteration
 def train(X_train, Y_train, X_test, Y_test, iterations, lr):
     w = np.zeros((X_train.shape[1], Y_train.shape[1]))
     for i in range(iterations):
@@ -41,7 +36,6 @@ def report(iteration, X_train, Y_train, X_test, Y_test, w):
     matches = matches * 100.0 / n_test_examples
     training_loss = loss(X_train, Y_train, w)
     print("%d - Loss: %.20f, %.2f%%" % (iteration, training_loss, matches))
-
 
 w = train(data.X_train, data.Y_train, data.X_test, data.Y_test, iterations = 200, lr = 1e-5)
 
